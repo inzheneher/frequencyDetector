@@ -6,6 +6,7 @@ int highest = 255;
 unsigned int t_delay = 1;
 int loopStep = 1;
 int fadeValue = 0;
+int counter = 0;
 
 unsigned long previousMillis = 0;        // will store last time LED was updated
 // constants won't change :
@@ -19,7 +20,16 @@ void setup() {
 
 void loop() {
   fadeUp();
-  pickDetector();
+  if (pickDetector()){
+    counter++;
+  }
+  if (counter == 100){
+    digitalWrite(2, HIGH);
+  }
+  if (counter ==200){
+    digitalWrite(2, LOW);
+    counter = 0;
+  }
   fadeDown();
   zeroDetector();
 }
@@ -52,9 +62,9 @@ void fadeDown(){
   }
 }
 
-void pickDetector(){
+boolean pickDetector(){
   if (analogRead(A0) > 900) {
-    digitalWrite(2, HIGH);
+    return true;    
   }
 }
 
