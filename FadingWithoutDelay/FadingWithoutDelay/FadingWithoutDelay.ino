@@ -1,4 +1,5 @@
 
+int actPin = 2;
 int ledPin = 13;    // LED connected to digital pin 9
 int sensorPin = A0;
 int lowest = 5;
@@ -9,29 +10,45 @@ int fadeValue = 0;
 int counter = 0;
 
 unsigned long previousMillis = 0;        // will store last time LED was updated
-// constants won't change :
 const long interval = 3;           // 1/0,000349 - детектируемая частота
 
+unsigned long detectedPreviousMillis = 0;
+const long detectedInterval = 5;
+ 
+unsigned long basePreviousMillis = 0;
+int detectedPulseAmountLowRange = 14;
+int detectedPulseAmountHighRange = 20; //high range of detected pulses 32767
+const long baseInterval = 100;
+
 void setup() {
-  // nothing happens in setup
   pinMode(sensorPin, INPUT);
-  pinMode(2, OUTPUT);
+  pinMode(actPin, OUTPUT);
+  Serial.begin(9600);
 }
 
 void loop() {
+  
+  unsigned long baseCurrentMillis = millis();
+  
   fadeUp();
+  
   if (pickDetector()){
     counter++;
   }
-  if (counter == 100){
-    digitalWrite(2, HIGH);
-  }
-  if (counter ==200){
-    digitalWrite(2, LOW);
-    counter = 0;
-  }
+  
   fadeDown();
-  zeroDetector();
+
+  if (baseCurrentMillis - basePreviousMillis >= baseInterval) {
+
+    basePreviousMillis = baseCurrentMillis;
+    
+    if (counter >= detectedPulseAmountLowRange && counter <= detectedPulseAmountHighRange) {
+      digitalWrite(actPin, HIGH);
+      counter = 0;
+    } else {
+      counter = 0;
+    }
+  }
 }
 
 void fadeUp(){
@@ -43,6 +60,7 @@ void fadeUp(){
       previousMillis = currentMillis;
   
       analogWrite(ledPin, fadeValue);
+      Serial.println(analogRead(A0));
       fadeValue++;
     }
   }  
@@ -57,6 +75,7 @@ void fadeDown(){
       previousMillis = currentMillis;
   
       analogWrite(ledPin, fadeValue);
+      Serial.println(analogRead(A0));
       fadeValue--;
     }
   }
@@ -64,13 +83,28 @@ void fadeDown(){
 
 boolean pickDetector(){
   if (analogRead(A0) > 900) {
-    return true;    
+    if (analogRead(A0) > 900) {
+      return true; 
+    }
   }
 }
 
 void zeroDetector(){
   if (analogRead(A0) < 100) {
     digitalWrite(2, LOW);
+  }
+}
+
+void intervalDetector (int count) {
+  unsigned long currentMillis = millis();
+    
+  if (currentMillis - detectedPreviousMillis >= detectedInterval) {
+    
+    detectedPreviousMillis = currentMillis;
+
+    if (count >= 500 && count <= 700) {
+      digitalWrite(2, HIGH);
+    }
   }
 }
 
