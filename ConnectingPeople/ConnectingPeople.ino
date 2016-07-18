@@ -5,25 +5,28 @@ const int pulsePin     = 12;
 const int buzzerPin    = 13;
 //***
 
+// Program enable trigger
 boolean trigger = false;
+//***
 
 // Buzzer configurations:
 const int frequency =  35;
 const int duration  = 500;
 //***
 
-unsigned long count = 0;
+// Timers vsriables
+unsigned long count        = 0;
 unsigned long currentCount = 0;
-
-int ledState = LOW;        
-
-int lowRange = 5000;
-
 unsigned long previousMillis      = 0;
 unsigned long countPreviousMillis = 0;
-
 const long interval       =   50;
 const long countInterval  = 1000;
+//***    
+
+// Pulses settings
+int lowRange = 5000; // Amount of counting pulses
+int ledState = LOW;  // Default pulse state
+//***
 
 void setup() {
   pinMode(pulsePin, OUTPUT);
@@ -31,6 +34,7 @@ void setup() {
 }
 
 void loop() {
+  
   if (digitalRead(triggerPin) == LOW) {
     trigger = true;
   }
