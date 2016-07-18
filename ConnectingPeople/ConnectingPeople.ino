@@ -4,6 +4,7 @@ const int triggerPin   =  3;
 const int sparkPin     = 11;
 const int pulsePin     = 12;
 const int buzzerPin    = 13;
+const int recivePin    = A0;
 //***
 
 // Program enable trigger
@@ -27,6 +28,16 @@ const long countInterval  = 1000;
 // Pulses settings
 int lowRange = 5000; // Amount of counting pulses
 int ledState = LOW;  // Default pulse state
+int pulseDetectionLevel = 450; // Detect pulses higher level, than this
+//***
+
+// Next stage settings
+const int nextStageDelay = 3000;
+//***
+
+// Random settings
+const int lowRange  =  0;
+const int highRange = 25;
 //***
 
 void setup() {
@@ -43,7 +54,7 @@ void loop() {
   
   // Program starts from here after signal from main controller
   if (trigger) {
-      analogWrite(sparkPin, random(0, 25));
+      analogWrite(sparkPin, random(lowRange, highRange));
     
   unsigned long currentMillis = micros();
   unsigned long countCurrentMillis = millis();
@@ -59,7 +70,7 @@ void loop() {
     }
     digitalWrite(pulsePin, ledState);
     
-    if (analogRead(A0) >= 450) {
+    if (analogRead(recivePin) >= pulseDetectionLevel) {
       count++;
       tone(buzzerPin, frequency, duration);
     } 
@@ -70,7 +81,7 @@ void loop() {
       
       if (count >= lowRange) {
         digitalWrite(nextStagePin, HIGH);
-        delay(3000);
+        delay(nextStageDelay);
         digitalWrite(nextStagePin, LOW);
         count = 0;
       }
