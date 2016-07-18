@@ -1,4 +1,5 @@
 
+const int actuatorPin = 2;
 const int ledPin =  12;
 
 boolean trigger = false;
@@ -9,7 +10,6 @@ unsigned long currentCount = 0;
 int ledState = LOW;        
 
 int lowRange = 5000;
-int highRange = 5050;
 
 unsigned long previousMillis = 0;
 unsigned long countPreviousMillis = 0;
