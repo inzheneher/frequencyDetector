@@ -1,8 +1,16 @@
-
-const int actuatorPin = 2;
-const int ledPin =  12;
+// Pin constant declaration
+const int nextStagePin =  2;
+const int triggerPin   =  3;
+const int pulsePin     = 12;
+const int buzzerPin    = 13;
+//***
 
 boolean trigger = false;
+
+// Buzzer configurations:
+const int frequency =  35;
+const int duration  = 500;
+//***
 
 unsigned long count = 0;
 unsigned long currentCount = 0;
@@ -11,19 +19,19 @@ int ledState = LOW;
 
 int lowRange = 5000;
 
-unsigned long previousMillis = 0;
+unsigned long previousMillis      = 0;
 unsigned long countPreviousMillis = 0;
 
-const long interval = 50;
-const long countInterval = 1000;
+const long interval       =   50;
+const long countInterval  = 1000;
 
 void setup() {
-  pinMode(ledPin, OUTPUT);
-  pinMode(3,INPUT_PULLUP);
+  pinMode(pulsePin, OUTPUT);
+  pinMode(triggerPin,INPUT_PULLUP);
 }
 
 void loop() {
-  if (digitalRead(3) == LOW) {
+  if (digitalRead(triggerPin) == LOW) {
     trigger = true;
   }
 
@@ -42,22 +50,21 @@ void loop() {
     } else {
       ledState = LOW;
     }
-    digitalWrite(ledPin, ledState);
+    digitalWrite(pulsePin, ledState);
     
     if (analogRead(A0) >= 450) {
       count++;
-      tone(13, 35, 500);
+      tone(buzzerPin, frequency, duration);
     } 
   }
 
     if (countCurrentMillis - countPreviousMillis >= countInterval) {
       countPreviousMillis = countCurrentMillis;
-
       
       if (count >= lowRange) {
-        digitalWrite(2, HIGH);
+        digitalWrite(nextStagePin, HIGH);
         delay(3000);
-        digitalWrite(2, LOW);
+        digitalWrite(nextStagePin, LOW);
         count = 0;
       }
       if (count == currentCount) {
