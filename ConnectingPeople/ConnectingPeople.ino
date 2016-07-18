@@ -1,6 +1,7 @@
 // Pin constant declaration
 const int nextStagePin =  2;
 const int triggerPin   =  3;
+const int sparkPin     = 11;
 const int pulsePin     = 12;
 const int buzzerPin    = 13;
 //***
@@ -34,13 +35,15 @@ void setup() {
 }
 
 void loop() {
-  
+
+  // Wait for signal from main controller
   if (digitalRead(triggerPin) == LOW) {
     trigger = true;
   }
-
+  
+  // Program starts from here after signal from main controller
   if (trigger) {
-      analogWrite(11, random(0, 25));
+      analogWrite(sparkPin, random(0, 25));
     
   unsigned long currentMillis = micros();
   unsigned long countCurrentMillis = millis();
