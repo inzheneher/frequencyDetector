@@ -55,7 +55,8 @@ void loop() {
   // Program starts from here after signal from main controller
   if (trigger) {
       analogWrite(sparkPin, random(lowRange, highRange));
-    
+
+  // 
   unsigned long currentMillis = micros();
   unsigned long countCurrentMillis = millis();
 
