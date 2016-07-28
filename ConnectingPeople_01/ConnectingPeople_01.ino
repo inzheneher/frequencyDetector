@@ -68,7 +68,7 @@ void loop() {
 
     unsigned long currentMillis       = micros();
     unsigned long countCurrentMillis  = millis();
-    unsigned long sparkCurrentMillis = millis();
+    unsigned long sparkCurrentMillis  = millis();
 
     if (sparkCurrentMillis - sparkPreviousMillis >= sparkInterval) {
 
