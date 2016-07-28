@@ -16,18 +16,20 @@ const int frequency =  1000;
 const int duration  = 500;
 //***
 
-// Timers vsriables
-unsigned long count        = 0;
-unsigned long currentCount = 0;
-unsigned long sparkCount   = 0;
+// Pulses counter
+unsigned long count        = 0; // pulses counter
+unsigned long currentCount = 0; // additional variable for pulses counter
+//***
 
-unsigned long previousMillis      = 0;
-unsigned long countPreviousMillis = 0;
+// Timers vsriables
+unsigned long previousMillis      = 0; // pulse generator variable
+unsigned long countPreviousMillis = 0; // count pulses variable
+unsigned long sparkPreviousMillis = 0; // spark generator variable
+
 const long interval       =   50; // pulse generator period (us)
 const long countInterval  = 1000; // count pulse interval (ms)
-long sparkInterval  =  100; // start time between sparks (ms)
-
-//***    
+long sparkInterval        =  100; // start time between sparks (ms)
+//***
 
 // Pulses settings
 int lowRange = 500; // Amount of counting pulses
@@ -46,13 +48,12 @@ const int highRangeRandom = 25;
 //***
 
 void setup() {
-  //Serial.begin(9600);
-  pinMode(pulsePin, OUTPUT);
-  pinMode(triggerPin,INPUT_PULLUP);
-  pinMode(nextStagePin, OUTPUT);
-  pinMode(sparkPin, OUTPUT);
-  pinMode(buzzerPin, OUTPUT);
-  pinMode(recivePin, INPUT);
+  pinMode(triggerPin, INPUT_PULLUP); // for start signal from MCU
+  pinMode(pulsePin, OUTPUT);         // pulse generator pin
+  pinMode(recivePin, INPUT);         // reciver pulses pin
+  pinMode(sparkPin, OUTPUT);         // spark generator pin
+  pinMode(buzzerPin, OUTPUT);        // buzz generator pin
+  pinMode(nextStagePin, OUTPUT);     // send signal to MCU after finish
 }
 
 void loop() {
@@ -61,56 +62,51 @@ void loop() {
   if (digitalRead(triggerPin) == LOW) {
     trigger = true;
   }
-  
+
   // Program starts from here after signal from main controller
   if (trigger) {
-      //analogWrite(sparkPin, random(lowRangeRandom, highRangeRandom));
 
-  
-  unsigned long currentMillis = micros();
-  unsigned long countCurrentMillis = millis();
-  unsigned long sparkPreviousMillis = millis();
+    unsigned long currentMillis       = micros();
+    unsigned long countCurrentMillis  = millis();
+    unsigned long sparkCurrentMillis = millis();
 
-  if (sparkPreviousMillis - sparkCount >= sparkInterval) {
-    
-    sparkCount = sparkPreviousMillis;
-    
-        if (sparkLedState == LOW) {
-          sparkLedState = HIGH;
-        } else {
-          sparkLedState = LOW;
-        }
-        digitalWrite(sparkPin, sparkLedState);
-        sparkInterval = random(150);
+    if (sparkCurrentMillis - sparkPreviousMillis >= sparkInterval) {
+
+      sparkPreviousMillis = sparkCurrentMillis;
+
+      if (sparkLedState == LOW) {
+        sparkLedState = HIGH;
+      } else {
+        sparkLedState = LOW;
       }
-
-  if (currentMillis - previousMillis >= interval) {
-    
-    previousMillis = currentMillis;
-
-    if (ledState == LOW) {
-      ledState = HIGH;
-    } else {
-      ledState = LOW;
+      digitalWrite(sparkPin, sparkLedState);
+      sparkInterval = random(150);
     }
-    digitalWrite(pulsePin, ledState);
-    //Serial.println(analogRead(recivePin));
-    if (analogRead(recivePin) > pulseDetectionLevel) {
-      
-      count++;
-      //Serial.println(digitalRead(recivePin));
-      tone(buzzerPin, frequency, duration);
-      //analogWrite(buzzerPin, random(35, 65));
-      digitalWrite(13, HIGH);
-    } else {
-      digitalWrite(13, LOW);
-      analogWrite(buzzerPin, 0);
+
+    if (currentMillis - previousMillis >= interval) {
+
+      previousMillis = currentMillis;
+
+      if (ledState == LOW) {
+        ledState = HIGH;
+      } else {
+        ledState = LOW;
+      }
+      digitalWrite(pulsePin, ledState);
+      if (analogRead(recivePin) > pulseDetectionLevel) {
+
+        count++;
+        tone(buzzerPin, frequency, duration);
+        digitalWrite(13, HIGH);
+      } else {
+        digitalWrite(13, LOW);
+        analogWrite(buzzerPin, 0);
+      }
     }
-  }
 
     if (countCurrentMillis - countPreviousMillis >= countInterval) {
       countPreviousMillis = countCurrentMillis;
-      
+
       if (count >= lowRange) {
         digitalWrite(sparkPin, LOW);
         digitalWrite(nextStagePin, HIGH);
@@ -123,7 +119,7 @@ void loop() {
         count = 0;
       }
       currentCount = count;
-    }  
+    }
   }
 }
 
